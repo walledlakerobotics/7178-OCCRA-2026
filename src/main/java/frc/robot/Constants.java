@@ -8,6 +8,12 @@ import com.pathplanner.lib.controllers.PathFollowingController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.util.Color;
+
+import static edu.wpi.first.units.Units.Seconds;
+
+import java.time.Period;
 
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -53,8 +59,8 @@ public final class Constants {
       new Translation2d(-kWheelBaseLength / 2, -kTrackWidth / 2));
 
 
-    public static final boolean kRightMotorsInverted = true;
-    public static final boolean kLeftMotorsInverted = false;
+    public static final boolean kRightMotorsInverted = false;
+    public static final boolean kLeftMotorsInverted = true;
 
     public static final double kPIDp = 0.2;
     public static final double kPIDi = 0.00;
@@ -81,6 +87,10 @@ public final class Constants {
     public static final double kPIDi = 0.00;
     public static final double kPIDd = 0.00;
 
+    public static final double kPPIDp = 2.00;
+    public static final double kPPIDi = 0.00;
+    public static final double kPPIDd = 0.00;
+
     public static final double kPosConvFactor = 0.01;
     public static final double kVelConvFactor = kPosConvFactor/60.0;
 
@@ -89,6 +99,28 @@ public final class Constants {
 
     public static final double kElevatorVelocityFactor = 1;
     public static final double kElevatorManualControlDeadband = 0.01;
+
+    public static final int kAnalogInput = 99;
+    public static final double kStringPodPositionConversionFactor = 100;
+  }
+
+  public static class IntakeConstants {
+    public static final int kIntakeSparkID = 23;
+    public static final boolean kIntakeMotorInverted = true;
+
+    public static final double kIntakeVelocity = 5;
+
+    public static final double kPIDp = 2.00;
+    public static final double kPIDi = 0.00;
+    public static final double kPIDd = 0.00;
+
+    public static final double kPosConvFactor = 0.01;
+    public static final double kVelConvFactor = kPosConvFactor/60.0;
+
+    public static final double kMaxVelocity = 1.5;
+    public static final double kMaxAcceleration = 1.5;
+    public static final int kLeftSensorChannel = 2;
+    public static final int kRightSensorChannel = 3;
   }
 
   public static class AutonConstants {
@@ -106,4 +138,10 @@ public final class Constants {
     }
   }
 
+  public static final class LEDConstants {
+    public static final LEDPattern kNoBalls = LEDPattern.solid(Color.kRed);
+    public static final LEDPattern kOneLeftBall = LEDPattern.solid(Color.kBlue);
+    public static final LEDPattern kOneRightBall = LEDPattern.solid(Color.kBlue);
+    public static final LEDPattern kTwoBalls = LEDPattern.solid(Color.kGreen);
+  }
 }

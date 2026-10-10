@@ -7,12 +7,12 @@ package frc.robot.subsystems;
 import java.util.function.DoubleSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -181,10 +181,10 @@ public class DriveTrain extends SubsystemBase {
     public void drive(ChassisSpeeds speeds) {
         MecanumDriveWheelSpeeds wheelSpeeds = MecanumDriveConstants.kDriveKinematics.toWheelSpeeds(speeds);
 
-        m_frontLeftClosedLoop.setReference(wheelSpeeds.frontLeftMetersPerSecond, ControlType.kMAXMotionVelocityControl);
-        m_rearLeftClosedLoop.setReference(wheelSpeeds.rearLeftMetersPerSecond, ControlType.kMAXMotionVelocityControl);
-        m_frontRightClosedLoop.setReference(wheelSpeeds.frontRightMetersPerSecond, ControlType.kMAXMotionVelocityControl);
-        m_rearRightClosedLoop.setReference(wheelSpeeds.rearRightMetersPerSecond, ControlType.kMAXMotionVelocityControl);
+        m_frontLeftClosedLoop.setSetpoint(wheelSpeeds.frontLeftMetersPerSecond, ControlType.kMAXMotionVelocityControl);
+        m_rearLeftClosedLoop.setSetpoint(wheelSpeeds.rearLeftMetersPerSecond, ControlType.kMAXMotionVelocityControl);
+        m_frontRightClosedLoop.setSetpoint(wheelSpeeds.frontRightMetersPerSecond, ControlType.kMAXMotionVelocityControl);
+        m_rearRightClosedLoop.setSetpoint(wheelSpeeds.rearRightMetersPerSecond, ControlType.kMAXMotionVelocityControl);
     }
 
     /**
@@ -212,7 +212,7 @@ public class DriveTrain extends SubsystemBase {
         return run(() -> {
             double xSpeed = -xSpeedSupplier.getAsDouble();
             double ySpeed = -ySpeedSupplier.getAsDouble();
-            double zRotation = -zRotationSupplier.getAsDouble();
+            double zRotation = zRotationSupplier.getAsDouble();
 
             xSpeed = MathUtil.applyDeadband(xSpeed, MecanumDriveConstants.kDeadband);
             ySpeed = MathUtil.applyDeadband(ySpeed, MecanumDriveConstants.kDeadband);

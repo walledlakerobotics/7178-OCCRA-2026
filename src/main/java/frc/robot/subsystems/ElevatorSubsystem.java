@@ -6,19 +6,20 @@ package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
+import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.MecanumDriveConstants;
@@ -28,7 +29,12 @@ public class ElevatorSubsystem extends SubsystemBase {
   SparkMax m_ElevatorSparkMax = new SparkMax(ElevatorConstants.kElevatorSparkID, MotorType.kBrushless);
   SparkClosedLoopController m_ElevatorClosedLoop;
   RelativeEncoder m_ElevatorEncoder;
-
+  
+  //Unhandled exception instantiating robot edu.wpi.first.hal.AnalogJNI edu.wpi.first.hal.util.AllocationException: Code: -1030
+  //AnalogInput m_StringPodAnalogInput = new AnalogInput(ElevatorConstants.kAnalogInput);
+  PIDController m_ElevatorPidController = new PIDController(ElevatorConstants.kPPIDp, ElevatorConstants.kPPIDi, ElevatorConstants.kPPIDd);
+  Double m_GoalHeight = 0.0;
+  Double m_GoalVelocity;
 
   public ElevatorSubsystem() {
     m_ElevatorClosedLoop = m_ElevatorSparkMax.getClosedLoopController();
@@ -47,7 +53,7 @@ public class ElevatorSubsystem extends SubsystemBase {
           .pid(ElevatorConstants.kPIDp, ElevatorConstants.kPIDi, ElevatorConstants.kPIDd);
 
       config.closedLoop.maxMotion
-          .maxVelocity(ElevatorConstants.kMaxVelocity)
+          .cruiseVelocity(ElevatorConstants.kMaxVelocity)
           .maxAcceleration(ElevatorConstants.kMaxAcceleration);
 
       config.inverted(ElevatorConstants.kElevatorMotorInverted);
@@ -56,24 +62,22 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   }
 
-  private boolean atGoal(double goal) {
-    return Math.abs(m_ElevatorEncoder.getPosition() - goal) < 0.05;
+  private double getHeight() {
+    return 0;//m_StringPodAnalogInput.getVoltage() * ElevatorConstants.kStringPodPositionConversionFactor;
   }
 
-   public Command elevatorSetPosition(double position) {
-     return runOnce(
-         () -> {
-             m_ElevatorClosedLoop.setReference(position, ControlType.kMAXMotionPositionControl);
-             
-         }).andThen(Commands.waitUntil(() -> atGoal(position)));
-   }
+  public Command elevatorSetPosition(double position) {
+    return runOnce(() -> {
+            m_GoalHeight = position;
+         });
+  }
+
   private void elevatorVelocityControl(double velocity) {
-    m_ElevatorClosedLoop.setReference(velocity, ControlType.kMAXMotionVelocityControl);
+    m_ElevatorClosedLoop.setSetpoint(velocity, ControlType.kMAXMotionVelocityControl);
   }
 
   public Command elevatorManualCommand(DoubleSupplier velocitySupplier) {
-    return run(
-        () -> {
+    return run(() -> {
             double velocity = MathUtil.applyDeadband(
                 -velocitySupplier.getAsDouble() , ElevatorConstants.kElevatorManualControlDeadband);
   
@@ -81,12 +85,20 @@ public class ElevatorSubsystem extends SubsystemBase {
             elevatorVelocityControl(velocity);
             SmartDashboard.putNumber("Elevator Input", velocity);
             SmartDashboard.putNumber("Elevator Vel", m_ElevatorEncoder.getVelocity());
-            
         });
   }
-//   @Override
-//   public void periodic() {
-//   }
+
+  public Command elevatorAutomaticCommand() {
+    return run(() -> {
+            elevatorVelocityControl(m_GoalVelocity);
+            SmartDashboard.putNumber("Elevator Input", m_GoalVelocity);
+        });
+  }
+
+  @Override
+  public void periodic() {
+    m_GoalVelocity = m_ElevatorPidController.calculate(m_GoalHeight, getHeight());
+  }
 
 }
 

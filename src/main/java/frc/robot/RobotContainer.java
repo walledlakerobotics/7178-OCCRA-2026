@@ -4,10 +4,6 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.commands.PathPlannerAuto;
-
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -18,6 +14,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.leds.LedSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -28,8 +26,9 @@ import frc.robot.subsystems.ElevatorSubsystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final DriveTrain m_MecanumSubsystem = new DriveTrain();
-  public final Compressor m_Compressor = new Compressor(30, PneumaticsModuleType.CTREPCM);
   private final ElevatorSubsystem m_Elevator = new ElevatorSubsystem();
+  private final LedSubsystem m_LedSubsystem = new LedSubsystem();
+  private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
   private final ShuffleboardTab m_AutonTab = Shuffleboard.getTab("Auton");
   private final SendableChooser<Command> m_AutonChooser;
 
@@ -41,19 +40,19 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    
     configureBindings();
     configureNamedCommands();
-    m_Compressor.enableDigital();
 
     m_AutonChooser = new SendableChooser<>();
 
     m_AutonChooser.setDefaultOption("None", Commands.none());
-    m_AutonChooser.addOption("Left", new PathPlannerAuto("LeftAuton"));
-    m_AutonChooser.addOption("Right" , new PathPlannerAuto("LeftAuton", true));
-    m_AutonChooser.addOption("TuneStraight", new PathPlannerAuto("Straight Tuning"));
-    m_AutonChooser.addOption("TuneGay", new PathPlannerAuto("Gay Tuning"));
+    // m_AutonChooser.addOption("NewAuton", new PathPlannerAuto("NewAuton"));
 
     m_AutonTab.add(m_AutonChooser);
+    m_IntakeSubsystem.oneLeftBall().whileTrue(m_LedSubsystem.oneLeft());
+    m_IntakeSubsystem.oneRightBall().whileTrue(m_LedSubsystem.oneRight());
+    m_IntakeSubsystem.twoBalls().whileTrue(m_LedSubsystem.two());
   }
 
   public void configureNamedCommands() {
@@ -84,6 +83,9 @@ public class RobotContainer {
           m_codriverController::getLeftY
         )
     );
+
+    m_codriverController.b().whileTrue(m_IntakeSubsystem.runIntake());
+    m_codriverController.a().whileTrue(m_IntakeSubsystem.reverseIntake());
 
     m_MecanumSubsystem.setDefaultCommand(
         m_MecanumSubsystem.driveJoysticks(

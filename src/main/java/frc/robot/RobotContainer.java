@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -26,6 +27,7 @@ import frc.robot.subsystems.leds.LedSubsystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final DriveTrain m_MecanumSubsystem = new DriveTrain();
+  @Logged
   private final ElevatorSubsystem m_Elevator = new ElevatorSubsystem();
   private final LedSubsystem m_LedSubsystem = new LedSubsystem();
   private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();

@@ -94,14 +94,19 @@ public final class Constants {
     public static final double kPosConvFactor = 0.01;
     public static final double kVelConvFactor = kPosConvFactor/60.0;
 
-    public static final double kMaxVelocity = 1.5;
+    public static final double kMaxVelocity = 2.5;
     public static final double kMaxAcceleration = 1.5;
 
     public static final double kElevatorVelocityFactor = 1;
     public static final double kElevatorManualControlDeadband = 0.01;
 
-    public static final int kAnalogInput = 99;
-    public static final double kStringPodPositionConversionFactor = 100;
+    public static final int kAnalogInput = 3;
+    public static final double kStringPodPositionConversionFactor = 9.5;
+
+    public static final double kMaxHeightInches = 38;
+    public static final double kSpeedClampCoefficient = 0.06;
+
+    public static final int kElevatorSmartCurrentLimit = 45;
   }
 
   public static class IntakeConstants {
@@ -140,8 +145,7 @@ public final class Constants {
 
   public static final class LEDConstants {
     public static final LEDPattern kNoBalls = LEDPattern.solid(Color.kRed);
-    public static final LEDPattern kOneLeftBall = LEDPattern.solid(Color.kBlue);
-    public static final LEDPattern kOneRightBall = LEDPattern.solid(Color.kBlue);
+    public static final LEDPattern kOneBall = LEDPattern.solid(Color.kBlue);
     public static final LEDPattern kTwoBalls = LEDPattern.solid(Color.kGreen);
   }
 }

@@ -15,6 +15,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -35,6 +37,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   PIDController m_ElevatorPidController = new PIDController(ElevatorConstants.kPPIDp, ElevatorConstants.kPPIDi, ElevatorConstants.kPPIDd);
   Double m_GoalHeight = 0.0;
   Double m_GoalVelocity;
+  AnalogInput m_StringPodAnalogInput = new AnalogInput(ElevatorConstants.kAnalogInput);
 
   public ElevatorSubsystem() {
     m_ElevatorClosedLoop = m_ElevatorSparkMax.getClosedLoopController();
@@ -42,7 +45,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     SparkMaxConfig config = new SparkMaxConfig();
       config
-          .smartCurrentLimit(MecanumDriveConstants.kSmartCurrentLimit)
+          .smartCurrentLimit(ElevatorConstants.kElevatorSmartCurrentLimit)
           .idleMode(IdleMode.kBrake);
 
       config.encoder
@@ -62,8 +65,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   }
 
-  private double getHeight() {
-    return 0;//m_StringPodAnalogInput.getVoltage() * ElevatorConstants.kStringPodPositionConversionFactor;
+  public double getHeight() {
+    return (m_StringPodAnalogInput.getVoltage() - 0.6) * ElevatorConstants.kStringPodPositionConversionFactor;
   }
 
   public Command elevatorSetPosition(double position) {
@@ -76,10 +79,21 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_ElevatorClosedLoop.setSetpoint(velocity, ControlType.kMAXMotionVelocityControl);
   }
 
+  public double clampSpeed(double speed) {
+    double height = getHeight();
+    if (speed > (ElevatorConstants.kMaxHeightInches - height) * ElevatorConstants.kSpeedClampCoefficient) {
+      return (ElevatorConstants.kMaxHeightInches - height) * ElevatorConstants.kSpeedClampCoefficient;
+    } else if (speed < -(height * ElevatorConstants.kSpeedClampCoefficient)){
+      return -height * ElevatorConstants.kSpeedClampCoefficient;
+    } else {
+      return speed;
+    }
+  }
+
   public Command elevatorManualCommand(DoubleSupplier velocitySupplier) {
     return run(() -> {
             double velocity = MathUtil.applyDeadband(
-                -velocitySupplier.getAsDouble() , ElevatorConstants.kElevatorManualControlDeadband);
+                clampSpeed(-velocitySupplier.getAsDouble()) , ElevatorConstants.kElevatorManualControlDeadband);
   
 
             elevatorVelocityControl(velocity);
@@ -98,6 +112,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     m_GoalVelocity = m_ElevatorPidController.calculate(m_GoalHeight, getHeight());
+    SmartDashboard.putNumber("HeightVoltage", getHeight());
   }
 
 }

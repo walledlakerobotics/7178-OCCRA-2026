@@ -104,7 +104,7 @@ public final class Constants {
     public static final double kStringPodPositionConversionFactor = 9.5;
 
     public static final double kMaxHeightInches = 38;
-    public static final double kSpeedClampCoefficient = 0.06;
+    public static final double kSpeedClampCoefficient = 0.14;
 
     public static final int kElevatorSmartCurrentLimit = 45;
   }
@@ -144,8 +144,8 @@ public final class Constants {
   }
 
   public static final class LEDConstants {
-    public static final LEDPattern kNoBalls = LEDPattern.solid(Color.kRed);
+    public static final LEDPattern kNoBallz = LEDPattern.solid(Color.kRed);
     public static final LEDPattern kOneBall = LEDPattern.solid(Color.kBlue);
-    public static final LEDPattern kTwoBalls = LEDPattern.solid(Color.kGreen);
+    public static final LEDPattern kTwoBallz = LEDPattern.solid(Color.kGreen);
   }
 }

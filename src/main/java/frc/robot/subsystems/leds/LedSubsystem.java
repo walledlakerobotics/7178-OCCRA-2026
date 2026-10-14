@@ -15,9 +15,8 @@ import frc.robot.Constants.LEDConstants;
 public class LedSubsystem extends SubsystemBase {
     AddressableLED m_led;
     AddressableLEDBuffer m_ledBuffer;
-   // AddressableLEDBufferView m_leftLED = m_ledBuffer.createView(0, 41);
-   // AddressableLEDBufferView m_rightLED = m_ledBuffer.createView(42, 83);
-
+    //AddressableLEDBufferView m_leftLED;
+    //AddressableLEDBufferView m_rightLED;
 
     public LedSubsystem() {
         // PWM port 9
@@ -29,6 +28,8 @@ public class LedSubsystem extends SubsystemBase {
       // Default to a length of 73, start empty output
       // Length is expensive to set, so only set it once, then just update data
       m_ledBuffer = new AddressableLEDBuffer(83);
+      //m_leftLED = m_ledBuffer.createView(0, 41);
+      //m_rightLED = m_ledBuffer.createView(42, 83);
       m_led.setLength(m_ledBuffer.getLength());
 
       // Write the data to the LED strip
@@ -42,28 +43,32 @@ public class LedSubsystem extends SubsystemBase {
      m_led.setData(m_ledBuffer);
     }
 
-    public Command pattern(LEDPattern pattern) {
-      return runOnce(() -> pattern.applyTo(m_ledBuffer))
+    public Command pattern(LEDPattern pattern, AddressableLEDBufferView buffer) {
+      return runOnce(() -> pattern.applyTo(buffer))
+        .andThen(idle())
+        .ignoringDisable(true);
+    }
+
+    public Command pattern(LEDPattern pattern, AddressableLEDBuffer buffer) {
+      return runOnce(() -> pattern.applyTo(buffer))
         .andThen(idle())
         .ignoringDisable(true);
     }
 
     public Command none() {
-      return pattern(LEDConstants.kNoBalls);
+      return pattern(LEDConstants.kNoBallz, m_ledBuffer);
     }
 
     public Command oneLeft() {
-      //LEDConstants.kOneBall.applyTo(m_leftLED);
-      return pattern(LEDConstants.kOneBall);
+      return pattern(LEDConstants.kOneBall, m_ledBuffer);
     }
 
      public Command oneRight() {
-      //LEDConstants.kOneBall.applyTo(m_rightLED);
-      return pattern(LEDConstants.kOneBall);
+      return pattern(LEDConstants.kOneBall, m_ledBuffer);
     }
 
     public Command two() {
-      return pattern(LEDConstants.kTwoBalls);
+       return pattern(LEDConstants.kTwoBallz, m_ledBuffer);
     }
 }
 

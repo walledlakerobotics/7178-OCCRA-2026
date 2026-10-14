@@ -66,7 +66,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   public double getHeight() {
-    return (m_StringPodAnalogInput.getVoltage() - 0.6) * ElevatorConstants.kStringPodPositionConversionFactor;
+    return (m_StringPodAnalogInput.getVoltage() - 0.3) * ElevatorConstants.kStringPodPositionConversionFactor;
   }
 
   public Command elevatorSetPosition(double position) {

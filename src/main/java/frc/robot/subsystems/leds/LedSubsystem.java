@@ -60,11 +60,11 @@ public class LedSubsystem extends SubsystemBase {
     }
 
     public Command oneLeft() {
-      return pattern(LEDConstants.kOneBall, m_ledBuffer);
+      return pattern(LEDConstants.kOneLeftBall, m_ledBuffer);
     }
 
      public Command oneRight() {
-      return pattern(LEDConstants.kOneBall, m_ledBuffer);
+      return pattern(LEDConstants.kOneRightBall, m_ledBuffer);
     }
 
     public Command two() {

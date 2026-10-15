@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -208,17 +209,17 @@ public class DriveTrain extends SubsystemBase {
      * @return A Command that drives the robot based on joystick inputs.
      */
     public Command driveJoysticks(DoubleSupplier xSpeedSupplier, DoubleSupplier ySpeedSupplier,
-            DoubleSupplier zRotationSupplier) {
+            DoubleSupplier zRotationSupplier, BooleanSupplier b) {
         return run(() -> {
             double xSpeed = -xSpeedSupplier.getAsDouble();
             double ySpeed = -ySpeedSupplier.getAsDouble();
-            double zRotation = zRotationSupplier.getAsDouble();
+            double zRotation = zRotationSupplier.getAsDouble() * 0.8;
 
             xSpeed = MathUtil.applyDeadband(xSpeed, MecanumDriveConstants.kDeadband);
             ySpeed = MathUtil.applyDeadband(ySpeed, MecanumDriveConstants.kDeadband);
             zRotation = MathUtil.applyDeadband(zRotation, MecanumDriveConstants.kDeadband);
 
-            drive(xSpeed, ySpeed, zRotation, false);
+            drive(xSpeed, ySpeed, zRotation, b.getAsBoolean());
         });
     }
 

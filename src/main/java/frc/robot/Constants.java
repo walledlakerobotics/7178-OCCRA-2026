@@ -144,8 +144,9 @@ public final class Constants {
   }
 
   public static final class LEDConstants {
-    public static final LEDPattern kNoBallz = LEDPattern.solid(Color.kRed);
-    public static final LEDPattern kOneBall = LEDPattern.solid(Color.kBlue);
+    public static final LEDPattern kNoBallz = LEDPattern.kOff;
+    public static final LEDPattern kOneRightBall = LEDPattern.solid(Color.kRed);
+    public static final LEDPattern kOneLeftBall = LEDPattern.solid(Color.kBlue);
     public static final LEDPattern kTwoBallz = LEDPattern.solid(Color.kGreen);
   }
 }

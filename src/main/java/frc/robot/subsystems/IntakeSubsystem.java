@@ -23,7 +23,7 @@ import frc.robot.Constants.MecanumDriveConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
 
-  SparkMax m_IntakeSparkMax = new SparkMax(IntakeConstants.kIntakeSparkID, MotorType.kBrushless);
+  SparkMax m_IntakeSparkMax = new SparkMax(IntakeConstants.kIntakeSparkID, MotorType.kBrushed);
   SparkClosedLoopController m_IntakeClosedLoop;
 
   DigitalInput m_LeftSensor = new DigitalInput(IntakeConstants.kLeftSensorChannel);

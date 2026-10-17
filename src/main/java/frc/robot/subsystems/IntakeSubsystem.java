@@ -62,7 +62,7 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void startReverseIntake() {
-    double velocity = IntakeConstants.kIntakeVelocity;
+    double velocity = -IntakeConstants.kIntakeVelocity;
 
     intakeVelocityControl(-velocity);
   }
@@ -77,6 +77,18 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public Command runIntake() {
     return startEnd(this::startIntake, this::stopIntake);
+  }
+
+  public Command runIntakeAuto() {
+    return run(() -> startIntake());
+  }
+
+  public Command runOutputAuto() {
+    return run(() -> startReverseIntake());
+  }
+
+  public Command stopIntakeAuto() {
+    return runOnce(() -> stopIntake());
   }
 
   public Command reverseIntake() {

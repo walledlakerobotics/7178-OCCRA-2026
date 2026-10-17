@@ -37,10 +37,12 @@ public final class Constants {
     public static final Translation2d kBackLeftTranslation2d = new Translation2d();
     public static final Translation2d kBackRightTranslation2d = new Translation2d();
 
-    public static final int kFrontLeftSparkID = 2;
-    public static final int kFrontRightSparkID = 4;
-    public static final int kBackLeftSparkID = 8;
-    public static final int kBackRightSparkID = 6;
+    public static final int kFrontLeftSparkID = 6;
+    public static final int kFrontRightSparkID = 8;
+    public static final int kBackLeftSparkID = 4;
+    public static final int kBackRightSparkID = 2;
+
+    public static final int kGyroCanID = 50;
 
     public static final double kForwardMaxSpeed = 7.0;
     public static final double kStrafeMaxSpeed = 3.5;
@@ -59,8 +61,8 @@ public final class Constants {
       new Translation2d(-kWheelBaseLength / 2, -kTrackWidth / 2));
 
 
-    public static final boolean kRightMotorsInverted = false;
-    public static final boolean kLeftMotorsInverted = true;
+    public static final boolean kRightMotorsInverted = true;
+    public static final boolean kLeftMotorsInverted = false;
 
     public static final double kPIDp = 0.2;
     public static final double kPIDi = 0.00;
@@ -76,7 +78,6 @@ public final class Constants {
     public static final double kRotationAxisSensitivity = 1;
 
     public static final double kDeadband = 0.05;
-      
   }
 
   public static class ElevatorConstants {
@@ -87,15 +88,15 @@ public final class Constants {
     public static final double kPIDi = 0.00;
     public static final double kPIDd = 0.00;
 
-    public static final double kPPIDp = 2.00;
+    public static final double kPPIDp = 0.30;
     public static final double kPPIDi = 0.00;
-    public static final double kPPIDd = 0.00;
+    public static final double kPPIDd = 0.02;
 
     public static final double kPosConvFactor = 0.01;
     public static final double kVelConvFactor = kPosConvFactor/60.0;
 
     public static final double kMaxVelocity = 2.5;
-    public static final double kMaxAcceleration = 1.5;
+    public static final double kMaxAcceleration = 1.2;
 
     public static final double kElevatorVelocityFactor = 1;
     public static final double kElevatorManualControlDeadband = 0.01;
@@ -103,8 +104,8 @@ public final class Constants {
     public static final int kAnalogInput = 3;
     public static final double kStringPodPositionConversionFactor = 9.5;
 
-    public static final double kMaxHeightInches = 38;
-    public static final double kSpeedClampCoefficient = 0.14;
+    public static final double kMaxHeightInches = 37;
+    public static final double kSpeedClampCoefficient = 0.08;
 
     public static final int kElevatorSmartCurrentLimit = 45;
   }

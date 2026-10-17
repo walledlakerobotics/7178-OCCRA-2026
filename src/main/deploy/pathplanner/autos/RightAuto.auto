@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Start Path"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ElevatorSetSetpointTop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RunElevator"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "OutputBalls"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeStop"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

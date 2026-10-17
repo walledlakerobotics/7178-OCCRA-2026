@@ -4,6 +4,12 @@
 
 package frc.robot;
 
+import java.util.function.DoubleSupplier;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -42,14 +48,14 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    
+  
     configureBindings();
     configureNamedCommands();
 
-    m_AutonChooser = new SendableChooser<>();
+    m_AutonChooser = AutoBuilder.buildAutoChooser();
 
     m_AutonChooser.setDefaultOption("None", Commands.none());
-    // m_AutonChooser.addOption("NewAuton", new PathPlannerAuto("NewAuton"));
+    m_AutonChooser.addOption("RightAuto", new PathPlannerAuto("RightAuto"));
 
     m_AutonTab.add(m_AutonChooser);
     m_IntakeSubsystem.oneLeftBall().whileTrue(m_LedSubsystem.oneLeft());
@@ -58,6 +64,11 @@ public class RobotContainer {
   }
 
   public void configureNamedCommands() {
+    NamedCommands.registerCommand("ElevatorSetSetpointBottom", m_Elevator.elevatorSetPosition(0.0));
+    NamedCommands.registerCommand("ElevatorSetSetpointTop", m_Elevator.elevatorSetPosition(35.0));
+    NamedCommands.registerCommand("IntakeBalls", m_IntakeSubsystem.runIntakeAuto());
+    NamedCommands.registerCommand("OutputBalls", m_IntakeSubsystem.runOutputAuto());
+    NamedCommands.registerCommand("IntakeStop", m_IntakeSubsystem.stopIntakeAuto());
   }
 
   /**
@@ -80,14 +91,11 @@ public class RobotContainer {
     // m_driverController.x().onTrue(new InstantCommand(() -> m_PusherSubsystem.ejectBlock()));
 
 
-    m_Elevator.setDefaultCommand(
-      m_Elevator.elevatorManualCommand(
-          m_codriverController::getLeftY
-        )
-    );
-
     m_codriverController.b().whileTrue(m_IntakeSubsystem.runIntake());
     m_codriverController.a().whileTrue(m_IntakeSubsystem.reverseIntake());
+
+    m_codriverController.x().whileTrue(m_Elevator.elevatorSetPosition(0.0));
+    m_codriverController.y().whileTrue(m_Elevator.elevatorSetPosition(35.0));
 
     m_MecanumSubsystem.setDefaultCommand(
         m_MecanumSubsystem.driveJoysticks(

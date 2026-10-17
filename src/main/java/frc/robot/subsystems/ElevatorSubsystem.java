@@ -102,16 +102,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         });
   }
 
-  public Command elevatorAutomaticCommand() {
-    return run(() -> {
-            elevatorVelocityControl(m_GoalVelocity);
-            SmartDashboard.putNumber("Elevator Input", m_GoalVelocity);
-        });
-  }
-
   @Override
   public void periodic() {
-    m_GoalVelocity = m_ElevatorPidController.calculate(m_GoalHeight, getHeight());
+    m_GoalVelocity = m_ElevatorPidController.calculate(getHeight(), m_GoalHeight);
+    elevatorVelocityControl(clampSpeed(m_GoalVelocity));
     SmartDashboard.putNumber("HeightVoltage", getHeight());
   }
 

@@ -35,7 +35,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.MecanumDriveConstants;
-
+import com.ctre.phoenix6.hardware.Pigeon2;
 /**
  * A subsystem that controls the robot's drive train.
  */
@@ -59,7 +59,7 @@ public class DriveTrain extends SubsystemBase {
     private final SparkClosedLoopController m_rearRightClosedLoop;
 
     // gyro
-    private final AHRS m_gyro = new AHRS(NavXComType.kUSB1);
+    private final Pigeon2 m_gyro = new Pigeon2(MecanumDriveConstants.kGyroCanID);
 
     // calculates odometry
     private final MecanumDriveOdometry m_odometry;
@@ -132,14 +132,13 @@ public class DriveTrain extends SubsystemBase {
         m_driveTab.addNumber("Robot Y (m)", () -> m_odometry.getPoseMeters().getY());
         m_driveTab.addNumber("Robot Heading (deg)", () -> m_gyro.getRotation2d().getDegrees());
         m_driveTab.addBoolean("NavXOn", () -> m_gyro.isConnected());
-        m_driveTab.addNumber("NavX_VelX", () -> m_gyro.getVelocityX());
 
         m_driveTab.add("Field", m_field);
 //(Pose2d newPose2d) -> resetOdometry(newPose2d)
         AutoBuilder.configure(m_odometry::getPoseMeters, this::resetOdometry, this::getChassisSpeeds,
                 this::drive, AutonConstants.kPathFollowingController, AutonConstants.kRobotConfig, () -> false, this);
         
-        m_driveTab.addNumber("NavX Bearing", m_gyro::getAngle);
+        m_driveTab.addNumber("NavX Bearing", () -> m_gyro.getRotation3d().toRotation2d().getDegrees());
     }
 
     /**
@@ -213,7 +212,7 @@ public class DriveTrain extends SubsystemBase {
         return run(() -> {
             double xSpeed = -xSpeedSupplier.getAsDouble();
             double ySpeed = -ySpeedSupplier.getAsDouble();
-            double zRotation = zRotationSupplier.getAsDouble() * 0.8;
+            double zRotation = -zRotationSupplier.getAsDouble() * 0.8;
 
             xSpeed = MathUtil.applyDeadband(xSpeed, MecanumDriveConstants.kDeadband);
             ySpeed = MathUtil.applyDeadband(ySpeed, MecanumDriveConstants.kDeadband);

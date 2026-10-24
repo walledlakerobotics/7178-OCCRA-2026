@@ -14,6 +14,7 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -56,6 +57,7 @@ public class RobotContainer {
 
     m_AutonChooser.setDefaultOption("None", Commands.none());
     m_AutonChooser.addOption("RightAuto", new PathPlannerAuto("RightAuto"));
+    m_AutonChooser.addOption("LeftAuto", new PathPlannerAuto("RightAuto", true));
 
     m_AutonTab.add(m_AutonChooser);
     m_IntakeSubsystem.oneLeftBall().whileTrue(m_LedSubsystem.oneLeft());
@@ -88,14 +90,15 @@ public class RobotContainer {
     );
     */
 
-    // m_driverController.x().onTrue(new InstantCommand(() -> m_PusherSubsystem.ejectBlock()));
 
+    m_codriverController.a().whileTrue(m_IntakeSubsystem.runIntake());
+    // m_codriverController.a().onFalse(m_IntakeSubsystem.stopIntakeAuto());
+    m_codriverController.b().whileTrue(m_IntakeSubsystem.reverseIntake());
+    // m_codriverController.b().onFalse(m_IntakeSubsystem.stopIntakeAuto());
 
-    m_codriverController.b().whileTrue(m_IntakeSubsystem.runIntake());
-    m_codriverController.a().whileTrue(m_IntakeSubsystem.reverseIntake());
-
-    m_codriverController.x().whileTrue(m_Elevator.elevatorSetPosition(0.0));
-    m_codriverController.y().whileTrue(m_Elevator.elevatorSetPosition(35.0));
+    m_codriverController.povDown().whileTrue(m_Elevator.elevatorSetPosition(0.0));
+    m_codriverController.povUp().whileTrue(m_Elevator.elevatorSetPosition(35.0));
+    m_codriverController.povLeft().whileTrue(m_Elevator.elevatorSetPosition(10.0));
 
     m_MecanumSubsystem.setDefaultCommand(
         m_MecanumSubsystem.driveJoysticks(

@@ -7,6 +7,8 @@ package frc.robot.subsystems;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
+import javax.lang.model.util.ElementScanner14;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
@@ -17,8 +19,6 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.studica.frc.AHRS;
-import com.studica.frc.AHRS.NavXComType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -207,6 +207,15 @@ public class DriveTrain extends SubsystemBase {
      * 
      * @return A Command that drives the robot based on joystick inputs.
      */
+
+    public double sqProp(Double Ctrl) {
+        if (Ctrl < 0) {
+            return Ctrl * Ctrl;
+        } else {
+            return -1 * Ctrl * Ctrl;
+        }
+    }
+
     public Command driveJoysticks(DoubleSupplier xSpeedSupplier, DoubleSupplier ySpeedSupplier,
             DoubleSupplier zRotationSupplier, BooleanSupplier b) {
         return run(() -> {

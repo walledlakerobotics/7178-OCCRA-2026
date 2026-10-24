@@ -1,0 +1,75 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.3612980962616736,
+        "y": 4.0
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.6303036164791191,
+        "y": 4.000372413556215
+      },
+      "isLocked": false,
+      "linkedName": "PullBack End 26"
+    },
+    {
+      "anchor": {
+        "x": 1.8038555650021653,
+        "y": 4.0
+      },
+      "prevControl": {
+        "x": 1.5538560002184858,
+        "y": 4.000466484695157
+      },
+      "nextControl": {
+        "x": 2.053855129785844,
+        "y": 3.999533515304843
+      },
+      "isLocked": false,
+      "linkedName": "Turn Around End 26"
+    },
+    {
+      "anchor": {
+        "x": 4.146806870121858,
+        "y": 4.0
+      },
+      "prevControl": {
+        "x": 3.2443367377794576,
+        "y": 3.9916948161298467
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 0.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.2,
+    "maxAcceleration": 3.3,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 360.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 179.39976297020667
+  },
+  "useDefaultConstraints": true
+}

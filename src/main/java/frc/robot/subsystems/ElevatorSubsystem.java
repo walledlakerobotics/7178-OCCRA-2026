@@ -6,10 +6,13 @@ package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
+import org.opencv.video.KalmanFilter;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -37,11 +40,13 @@ public class ElevatorSubsystem extends SubsystemBase {
   PIDController m_ElevatorPidController = new PIDController(ElevatorConstants.kPPIDp, ElevatorConstants.kPPIDi, ElevatorConstants.kPPIDd);
   Double m_GoalHeight = 0.0;
   Double m_GoalVelocity;
+  Double m_CurrentHeight;
   AnalogInput m_StringPodAnalogInput = new AnalogInput(ElevatorConstants.kAnalogInput);
 
   public ElevatorSubsystem() {
     m_ElevatorClosedLoop = m_ElevatorSparkMax.getClosedLoopController();
     m_ElevatorEncoder = m_ElevatorSparkMax.getEncoder();
+    m_CurrentHeight = 0.0;
 
     SparkMaxConfig config = new SparkMaxConfig();
       config
@@ -63,10 +68,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 
       m_ElevatorSparkMax.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+      SmartDashboard.putNumber("Elevator/Feedforward", 0.05);
+
   }
 
   public double getHeight() {
-    return (m_StringPodAnalogInput.getVoltage() - 0.3) * ElevatorConstants.kStringPodPositionConversionFactor;
+    return (m_StringPodAnalogInput.getVoltage() - 0.32) * ElevatorConstants.kStringPodPositionConversionFactor;
   }
 
   public Command elevatorSetPosition(double position) {
@@ -75,8 +82,8 @@ public class ElevatorSubsystem extends SubsystemBase {
          });
   }
 
-  private void elevatorVelocityControl(double velocity) {
-    m_ElevatorClosedLoop.setSetpoint(velocity, ControlType.kMAXMotionVelocityControl);
+  private void elevatorVelocityControl(double velocity, double feedforward) {
+    m_ElevatorClosedLoop.setSetpoint(velocity, ControlType.kMAXMotionVelocityControl, ClosedLoopSlot.kSlot0, feedforward);
   }
 
   public double clampSpeed(double speed) {
@@ -96,7 +103,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 clampSpeed(-velocitySupplier.getAsDouble()) , ElevatorConstants.kElevatorManualControlDeadband);
   
 
-            elevatorVelocityControl(velocity);
+            elevatorVelocityControl(velocity, 0.0);
             SmartDashboard.putNumber("Elevator Input", velocity);
             SmartDashboard.putNumber("Elevator Vel", m_ElevatorEncoder.getVelocity());
         });
@@ -104,9 +111,15 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    m_GoalVelocity = m_ElevatorPidController.calculate(getHeight(), m_GoalHeight);
-    elevatorVelocityControl(clampSpeed(m_GoalVelocity));
+    if (Math.abs(m_GoalHeight - getHeight()) < 0.6 ) {
+      m_GoalVelocity = 0.0;
+    } else {
+      m_GoalVelocity = m_ElevatorPidController.calculate(getHeight(), m_GoalHeight);
+    }
+
+    elevatorVelocityControl(clampSpeed(m_GoalVelocity), SmartDashboard.getNumber("Elevator/Feedforward", 0.05));
     SmartDashboard.putNumber("HeightVoltage", getHeight());
+    SmartDashboard.putNumber("SPVoltage", m_StringPodAnalogInput.getVoltage());
   }
 
 }

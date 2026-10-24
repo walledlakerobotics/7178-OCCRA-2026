@@ -96,7 +96,7 @@ public final class Constants {
     public static final double kVelConvFactor = kPosConvFactor/60.0;
 
     public static final double kMaxVelocity = 2.5;
-    public static final double kMaxAcceleration = 1.2;
+    public static final double kMaxAcceleration = 1.8;
 
     public static final double kElevatorVelocityFactor = 1;
     public static final double kElevatorManualControlDeadband = 0.01;
@@ -105,7 +105,7 @@ public final class Constants {
     public static final double kStringPodPositionConversionFactor = 9.5;
 
     public static final double kMaxHeightInches = 37;
-    public static final double kSpeedClampCoefficient = 0.08;
+    public static final double kSpeedClampCoefficient = 0.10;
 
     public static final int kElevatorSmartCurrentLimit = 45;
   }
@@ -125,6 +125,7 @@ public final class Constants {
 
     public static final double kMaxVelocity = 1.5;
     public static final double kMaxAcceleration = 1.5;
+    
     public static final int kLeftSensorChannel = 2;
     public static final int kRightSensorChannel = 3;
   }
@@ -145,9 +146,18 @@ public final class Constants {
   }
 
   public static final class LEDConstants {
-    public static final LEDPattern kNoBallz = LEDPattern.kOff;
-    public static final LEDPattern kOneRightBall = LEDPattern.solid(Color.kRed);
+    public static final LEDPattern kNoBallz = LEDPattern.solid(Color.kRed);
+    public static final LEDPattern kOneRightBall = LEDPattern.solid(Color.kBlue);
     public static final LEDPattern kOneLeftBall = LEDPattern.solid(Color.kBlue);
     public static final LEDPattern kTwoBallz = LEDPattern.solid(Color.kGreen);
+  }
+
+  public static final class PinpointConstants {
+    public static final int kReset = 1<<1;
+
+    public static final int kXReverse = 1<<4;
+    public static final int kXForward = 1<<5;
+    public static final int kYReverse = 1<<2;
+    public static final int kYForward = 1<<3;
   }
 }

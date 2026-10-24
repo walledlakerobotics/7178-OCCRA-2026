@@ -51,28 +51,21 @@ public class IntakeSubsystem extends SubsystemBase {
 
   }
   private void intakeVelocityControl(double velocity) {
-    m_IntakeClosedLoop.setSetpoint(velocity, ControlType.kMAXMotionVelocityControl);
+    m_IntakeClosedLoop.setSetpoint(velocity, ControlType.kVelocity);
   }
 
   public void startIntake() {
-    double velocity = IntakeConstants.kIntakeVelocity;
-
-
-    intakeVelocityControl(velocity);
+    intakeVelocityControl(-IntakeConstants.kIntakeVelocity);
   }
 
   public void startReverseIntake() {
-    double velocity = -IntakeConstants.kIntakeVelocity;
-
-    intakeVelocityControl(-velocity);
+    intakeVelocityControl(IntakeConstants.kIntakeVelocity);
   }
 
 
 
   public void stopIntake() {
-    double velocity = 0.0;
-
-    intakeVelocityControl(velocity);
+    m_IntakeClosedLoop.setSetpoint(0.0, ControlType.kVelocity);
   }
 
   public Command runIntake() {
@@ -80,11 +73,11 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public Command runIntakeAuto() {
-    return run(() -> startIntake());
+    return runOnce(() -> startIntake());
   }
 
   public Command runOutputAuto() {
-    return run(() -> startReverseIntake());
+    return runOnce(() -> startReverseIntake());
   }
 
   public Command stopIntakeAuto() {

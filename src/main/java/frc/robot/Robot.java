@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -20,6 +21,10 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   @Logged
   private final RobotContainer m_robotContainer = new RobotContainer();
+
+  public Robot() {
+    Epilogue.bind(this);
+  }
 
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics

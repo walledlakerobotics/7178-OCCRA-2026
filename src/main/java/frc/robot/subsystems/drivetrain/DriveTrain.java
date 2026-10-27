@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.drivetrain;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -21,6 +21,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -31,6 +32,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AutonConstants;
@@ -58,6 +60,23 @@ public class DriveTrain extends SubsystemBase {
     private final SparkClosedLoopController m_frontRightClosedLoop;
     private final SparkClosedLoopController m_rearRightClosedLoop;
 
+    //Heading Alignment PID Controller
+    private final PIDController m_headingAlignController = new PIDController(
+        MecanumDriveConstants.kHAPIDp, 
+        MecanumDriveConstants.kHAPIDi, 
+        MecanumDriveConstants.kHAPIDd);
+
+    // TEMPORARY
+    private double m_SRCF = 0.0;
+
+    //Lateral Alignment PID Controller
+    private final PIDController m_lateralAlignController = new PIDController(
+        MecanumDriveConstants.kLAPIDp, 
+        MecanumDriveConstants.kLAPIDi, 
+        MecanumDriveConstants.kLAPIDd);
+
+        Double m_lateralAlignSetpoint = 2.0;
+
     // gyro
     private final Pigeon2 m_gyro = new Pigeon2(MecanumDriveConstants.kGyroCanID);
 
@@ -80,6 +99,8 @@ public class DriveTrain extends SubsystemBase {
      * Constructs a {@link DriveTrain}.
      */
     public DriveTrain() {
+        
+
         SparkMaxConfig config = new SparkMaxConfig();
         
 
@@ -125,8 +146,7 @@ public class DriveTrain extends SubsystemBase {
         m_frontRightClosedLoop = m_frontRightMotor.getClosedLoopController();
         m_rearRightClosedLoop = m_rearRightMotor.getClosedLoopController();
 
-        m_odometry = new MecanumDriveOdometry(MecanumDriveConstants.kDriveKinematics, m_gyro.getRotation2d(),
-                getWheelPositions());
+        m_odometry = new Pinpoint();
 
         m_driveTab.addNumber("Robot X (m)", () -> m_odometry.getPoseMeters().getX());
         m_driveTab.addNumber("Robot Y (m)", () -> m_odometry.getPoseMeters().getY());
@@ -226,6 +246,38 @@ public class DriveTrain extends SubsystemBase {
             xSpeed = MathUtil.applyDeadband(xSpeed, MecanumDriveConstants.kDeadband);
             ySpeed = MathUtil.applyDeadband(ySpeed, MecanumDriveConstants.kDeadband);
             zRotation = MathUtil.applyDeadband(zRotation, MecanumDriveConstants.kDeadband);
+
+            drive(xSpeed, ySpeed, zRotation, b.getAsBoolean());
+        });
+    }
+
+    public Command resetLateralAlignSetpoint() {
+        return runOnce(() -> m_lateralAlignSetpoint = m_odometry.getPoseMeters().getY());
+    }
+
+    public Command driveJoysticksGoalAlign(DoubleSupplier xSpeedSupplier, BooleanSupplier b) {
+        return run(() -> {
+            double xSpeed = -xSpeedSupplier.getAsDouble();
+            double ySpeed = m_lateralAlignController.calculate(m_odometry.getPoseMeters().getY(), m_lateralAlignSetpoint);
+            double zRotation = m_headingAlignController.calculate(m_gyro.getRotation2d().getDegrees(), 180);
+
+            xSpeed = MathUtil.applyDeadband(xSpeed, MecanumDriveConstants.kDeadband);
+            // zRotation = zRotation * ySpeed * MecanumDriveConstants.kSRCF;
+            // zRotation = zRotation * ySpeed * m_SRCF;
+
+            drive(xSpeed, ySpeed, zRotation, b.getAsBoolean());
+        });
+    }
+
+     public Command driveJoysticksGoalAlignHdgOnly(DoubleSupplier xSpeedSupplier, DoubleSupplier ySpeedSupplier, BooleanSupplier b) {
+        return run(() -> {
+            double SRCF = SmartDashboard.getNumber("SCRF", 0.0);
+            double xSpeed = -xSpeedSupplier.getAsDouble();
+            double ySpeed = -ySpeedSupplier.getAsDouble();
+            double zRotation = m_headingAlignController.calculate(m_gyro.getRotation2d().getDegrees(), 180);
+
+            xSpeed = MathUtil.applyDeadband(xSpeed, MecanumDriveConstants.kDeadband);
+            zRotation = zRotation + ySpeed * SRCF;
 
             drive(xSpeed, ySpeed, zRotation, b.getAsBoolean());
         });

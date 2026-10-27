@@ -1,13 +1,23 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
+    id "org.jetbrains.kotlin.jvm" version "2.4.20"
     id "java"
     id "edu.wpi.first.GradleRIO" version "2026.1.1"
-    id "org.jetbrains.kotlin.jvm" version "2.4.20"
+}
 
+kotlin {
+    jvmToolchain(17)
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+}
+
+sourceSets {
+    main.java.srcDirs += 'src/main/java'
+    main.kotlin.srcDirs += 'src/main/java'
 }
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
@@ -75,6 +85,11 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation 'org.lz4:lz4-pure-java:1.8.0'
+    implementation 'com.fazecast:jSerialComm:[2.0.0,3.0.0)'
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-io-core:0.9.1'
 }
 
 test {
@@ -106,4 +121,8 @@ wpi.java.configureTestTasks(test)
 // Configure string concat to always inline compile
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
+}
+
+tasks.withType(KotlinCompile) {
+    compilerOptions.freeCompilerArgs.add '-Xstring-concat=inline'
 }

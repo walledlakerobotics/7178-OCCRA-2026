@@ -68,6 +68,16 @@ public final class Constants {
     public static final double kPIDi = 0.00;
     public static final double kPIDd = 0.00;
 
+    public static final double kHAPIDp = 0.2;
+    public static final double kHAPIDi = 0.00;
+    public static final double kHAPIDd = 0.00;
+
+    public static final double kLAPIDp = 0.2;
+    public static final double kLAPIDi = 0.00;
+    public static final double kLAPIDd = 0.00;
+
+    // public static double kSRCF = 0.0;
+
     public static final double kPosConvFactor = ((Units.inchesToMeters(6) * Math.PI) / 8.451);
     public static final double kVelConvFactor = kPosConvFactor / 60.0;
     

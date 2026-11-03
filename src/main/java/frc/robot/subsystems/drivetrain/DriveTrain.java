@@ -146,7 +146,8 @@ public class DriveTrain extends SubsystemBase {
         m_frontRightClosedLoop = m_frontRightMotor.getClosedLoopController();
         m_rearRightClosedLoop = m_rearRightMotor.getClosedLoopController();
 
-        m_odometry = new Pinpoint();
+        m_odometry = new MecanumDriveOdometry(MecanumDriveConstants.kDriveKinematics, m_gyro.getRotation2d(),
+                getWheelPositions());
 
         m_driveTab.addNumber("Robot X (m)", () -> m_odometry.getPoseMeters().getX());
         m_driveTab.addNumber("Robot Y (m)", () -> m_odometry.getPoseMeters().getY());

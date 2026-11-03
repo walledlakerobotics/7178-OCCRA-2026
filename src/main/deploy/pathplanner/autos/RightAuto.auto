@@ -11,15 +11,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "sequential",
           "data": {
-            "name": "ElevatorSetSetpointTop"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.5
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevatorSetSetpointTop"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 1.4
+                }
+              }
+            ]
           }
         },
         {
@@ -47,13 +54,50 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "IntakeBalls"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "PullBack"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevatorSetSetpointBottom"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Turn Around"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "PullBack"
+                  "pathName": "P5"
                 }
               },
               {
@@ -69,7 +113,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "ElevatorSetSetpointBottom"
+                        "name": "ElevatorSetSetpointTop"
                       }
                     }
                   ]
@@ -81,13 +125,7 @@
         {
           "type": "named",
           "data": {
-            "name": "IntakeBalls"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Turn Around"
+            "name": "OutputBalls"
           }
         }
       ]

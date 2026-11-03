@@ -31,10 +31,10 @@ import frc.robot.subsystems.leds.LedSubsystem;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
+@Logged
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final DriveTrain m_MecanumSubsystem = new DriveTrain();
-  @Logged
   private final ElevatorSubsystem m_Elevator = new ElevatorSubsystem();
   private final LedSubsystem m_LedSubsystem = new LedSubsystem();
   private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
@@ -58,6 +58,8 @@ public class RobotContainer {
     m_AutonChooser.setDefaultOption("None", Commands.none());
     m_AutonChooser.addOption("RightAuto", new PathPlannerAuto("RightAuto"));
     m_AutonChooser.addOption("LeftAuto", new PathPlannerAuto("RightAuto", true));
+    m_AutonChooser.addOption("TestAuto", new PathPlannerAuto("TestAuto"));
+
 
     m_AutonTab.add(m_AutonChooser);
     m_IntakeSubsystem.oneLeftBall().whileTrue(m_LedSubsystem.oneLeft());
@@ -108,6 +110,14 @@ public class RobotContainer {
             m_driverController.leftBumper()
         )
     );
+
+    m_driverController.rightTrigger().whileTrue(m_MecanumSubsystem.driveJoysticksGoalAlignHdgOnly(
+            m_driverController::getLeftY, 
+            m_driverController::getLeftX,
+            m_driverController.leftBumper()
+          ));
+
+    m_driverController.a().onTrue(m_MecanumSubsystem.resetOdometry00());
   }
 
     

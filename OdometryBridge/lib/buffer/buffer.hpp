@@ -140,7 +140,6 @@ class SerialBuffer : public Buffer
             while (size() < sizeof(T)) {
                 serial.readBytes(write_ptr(serial.available()), serial.available());
 
-                yield();
                 delay(10);
             }
 

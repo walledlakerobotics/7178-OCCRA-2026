@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 
@@ -23,6 +24,8 @@ public class Robot extends TimedRobot {
   private final RobotContainer m_robotContainer = new RobotContainer();
 
   public Robot() {
+    DriverStation.silenceJoystickConnectionWarning(true);
+
     Epilogue.bind(this);
   }
 

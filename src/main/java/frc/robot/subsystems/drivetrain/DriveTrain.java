@@ -9,6 +9,9 @@ import java.util.function.DoubleSupplier;
 
 import javax.lang.model.util.ElementScanner14;
 
+import org.walledlakerobotics.pinpointrio.EncoderDirection;
+import org.walledlakerobotics.pinpointrio.Pinpoint;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
@@ -20,15 +23,21 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.math.kinematics.Odometry;
+import edu.wpi.first.math.kinematics.Odometry3d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -41,6 +50,7 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 /**
  * A subsystem that controls the robot's drive train.
  */
+@Logged
 public class DriveTrain extends SubsystemBase {
     // drive train motors
     private final SparkMax m_frontLeftMotor = new SparkMax(MecanumDriveConstants.kFrontLeftSparkID, MotorType.kBrushless);
@@ -65,9 +75,7 @@ public class DriveTrain extends SubsystemBase {
         MecanumDriveConstants.kHAPIDp, 
         MecanumDriveConstants.kHAPIDi, 
         MecanumDriveConstants.kHAPIDd);
-
-    // TEMPORARY
-    private double m_SRCF = 0.0;
+        
 
     //Lateral Alignment PID Controller
     private final PIDController m_lateralAlignController = new PIDController(
@@ -81,7 +89,9 @@ public class DriveTrain extends SubsystemBase {
     private final Pigeon2 m_gyro = new Pigeon2(MecanumDriveConstants.kGyroCanID);
 
     // calculates odometry
-    private final MecanumDriveOdometry m_odometry;
+
+    @Logged 
+    private final HDriveOdometry m_odometry2 = new HDriveOdometry();
 
     // displays robot position on field
     private final Field2d m_field = new Field2d();
@@ -101,8 +111,10 @@ public class DriveTrain extends SubsystemBase {
     public DriveTrain() {
         
 
+        SmartDashboard.putNumber("SRCF", 0.0);
+        m_headingAlignController.enableContinuousInput(0.0, 360);
+
         SparkMaxConfig config = new SparkMaxConfig();
-        
 
         // sets the idle mode, the smart current limit, and the inversion
         config
@@ -146,23 +158,13 @@ public class DriveTrain extends SubsystemBase {
         m_frontRightClosedLoop = m_frontRightMotor.getClosedLoopController();
         m_rearRightClosedLoop = m_rearRightMotor.getClosedLoopController();
 
-        m_odometry = new MecanumDriveOdometry(MecanumDriveConstants.kDriveKinematics, m_gyro.getRotation2d(), new MecanumDriveWheelPositions(
-            m_frontLeftEncoder.getPosition(),
-            m_frontRightEncoder.getPosition(),
-            m_rearLeftEncoder.getPosition(),
-            m_rearRightEncoder.getPosition()));
-
-        m_driveTab.addNumber("Robot X (m)", () -> m_odometry.getPoseMeters().getX());
-        m_driveTab.addNumber("Robot Y (m)", () -> m_odometry.getPoseMeters().getY());
-        m_driveTab.addNumber("Robot Heading (deg)", () -> m_gyro.getRotation2d().getDegrees());
-        m_driveTab.addBoolean("NavXOn", () -> m_gyro.isConnected());
-
         m_driveTab.add("Field", m_field);
 //(Pose2d newPose2d) -> resetOdometry(newPose2d)
-        AutoBuilder.configure(m_odometry::getPoseMeters, this::resetOdometry, this::getChassisSpeeds,
+        AutoBuilder.configure(m_odometry2::getPose, this::resetOdometry, m_odometry2::getChassisSpeeds,
                 this::drive, AutonConstants.kPathFollowingController, AutonConstants.kRobotConfig, () -> false, this);
         
-        m_driveTab.addNumber("NavX Bearing", () -> m_gyro.getRotation3d().toRotation2d().getDegrees());
+
+        m_driveTab.addNumber("Heading", () -> m_gyro.getRotation3d().toRotation2d().getDegrees());
     }
 
     /**
@@ -243,9 +245,10 @@ public class DriveTrain extends SubsystemBase {
     public Command driveJoysticks(DoubleSupplier xSpeedSupplier, DoubleSupplier ySpeedSupplier,
             DoubleSupplier zRotationSupplier, BooleanSupplier b) {
         return run(() -> {
+
             double xSpeed = -xSpeedSupplier.getAsDouble();
             double ySpeed = -ySpeedSupplier.getAsDouble();
-            double zRotation = -zRotationSupplier.getAsDouble() * 0.8;
+            double zRotation = -(zRotationSupplier.getAsDouble() * 0.8) + (ySpeed * (-0.06));
 
             xSpeed = MathUtil.applyDeadband(xSpeed, MecanumDriveConstants.kDeadband);
             ySpeed = MathUtil.applyDeadband(ySpeed, MecanumDriveConstants.kDeadband);
@@ -256,18 +259,17 @@ public class DriveTrain extends SubsystemBase {
     }
 
     public Command resetLateralAlignSetpoint() {
-        return runOnce(() -> m_lateralAlignSetpoint = m_odometry.getPoseMeters().getY());
+        return runOnce(() -> m_lateralAlignSetpoint = m_odometry2.getPose().getY());
     }
 
     public Command driveJoysticksGoalAlign(DoubleSupplier xSpeedSupplier, BooleanSupplier b) {
         return run(() -> {
             double xSpeed = -xSpeedSupplier.getAsDouble();
-            double ySpeed = m_lateralAlignController.calculate(m_odometry.getPoseMeters().getY(), m_lateralAlignSetpoint);
-            double zRotation = m_headingAlignController.calculate(m_gyro.getRotation2d().getDegrees(), 180);
+            double ySpeed = m_lateralAlignController.calculate(m_odometry2.getPose().getY(), m_lateralAlignSetpoint);
+            double zRotation = m_headingAlignController.calculate(m_gyro.getRotation2d().getDegrees(), 180) + (ySpeed * (-0.06));
 
             xSpeed = MathUtil.applyDeadband(xSpeed, MecanumDriveConstants.kDeadband);
-            // zRotation = zRotation * ySpeed * MecanumDriveConstants.kSRCF;
-            // zRotation = zRotation * ySpeed * m_SRCF;
+  
 
             drive(xSpeed, ySpeed, zRotation, b.getAsBoolean());
         });
@@ -275,16 +277,16 @@ public class DriveTrain extends SubsystemBase {
 
      public Command driveJoysticksGoalAlignHdgOnly(DoubleSupplier xSpeedSupplier, DoubleSupplier ySpeedSupplier, BooleanSupplier b) {
         return run(() -> {
-            double SRCF = SmartDashboard.getNumber("SCRF", 0.0);
+
             double xSpeed = -xSpeedSupplier.getAsDouble();
             double ySpeed = -ySpeedSupplier.getAsDouble();
-            double zRotation = m_headingAlignController.calculate(m_gyro.getRotation2d().getDegrees(), 180);
+            double zRotation = m_headingAlignController.calculate(m_gyro.getRotation2d().getDegrees(), 0);
 
             xSpeed = MathUtil.applyDeadband(xSpeed, MecanumDriveConstants.kDeadband);
-            zRotation = zRotation + ySpeed * SRCF;
+            zRotation = zRotation + ySpeed * (-0.06);
 
             drive(xSpeed, ySpeed, zRotation, b.getAsBoolean());
-        });
+        }).andThen(() -> m_headingAlignController.reset());
     }
 
     /**
@@ -300,17 +302,7 @@ public class DriveTrain extends SubsystemBase {
      * 
      * @return The current robot relative chassis speeds.
      */
-    public ChassisSpeeds getChassisSpeeds() {
-        MecanumDriveWheelSpeeds wheelSpeeds = new MecanumDriveWheelSpeeds(
-                m_frontLeftEncoder.getVelocity(),
-                m_frontRightEncoder.getVelocity(),
-                m_rearLeftEncoder.getVelocity(),
-                m_rearRightEncoder.getVelocity());
-
-        ChassisSpeeds speeds = MecanumDriveConstants.kDriveKinematics.toChassisSpeeds(wheelSpeeds);
-
-        return speeds;
-    }
+    
 
     /**
      * Gets the current wheel positions in meters.
@@ -332,7 +324,11 @@ public class DriveTrain extends SubsystemBase {
      * @param pose The Pose2d object.
      */
     public void resetOdometry(Pose2d pose) {
-        m_odometry.resetPosition(m_gyro.getRotation2d(), getWheelPositions(), pose);
+        m_odometry2.resetPose(pose);
+    }
+
+    public Command resetOdometry00() {
+        return runOnce(() -> resetOdometry(new Pose2d(new Translation2d(2.4,1.6), new Rotation2d(Math.PI))));
     }
 
     /**
@@ -374,9 +370,7 @@ public class DriveTrain extends SubsystemBase {
 
     @Override
     public void periodic() {
-        m_odometry.update(m_gyro.getRotation2d(), getWheelPositions());
-
-        m_field.setRobotPose(m_odometry.getPoseMeters());
+        m_field.setRobotPose(m_odometry2.getPose());
     }
 
     @Override

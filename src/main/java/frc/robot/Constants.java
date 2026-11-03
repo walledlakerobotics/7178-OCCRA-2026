@@ -68,9 +68,9 @@ public final class Constants {
     public static final double kPIDi = 0.00;
     public static final double kPIDd = 0.00;
 
-    public static final double kHAPIDp = 0.2;
+    public static final double kHAPIDp = 0.022;
     public static final double kHAPIDi = 0.00;
-    public static final double kHAPIDd = 0.00;
+    public static final double kHAPIDd = 0.0035;
 
     public static final double kLAPIDp = 0.2;
     public static final double kLAPIDi = 0.00;

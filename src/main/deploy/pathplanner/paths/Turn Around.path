@@ -3,28 +3,28 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3612980962616736,
-        "y": 4.0
+        "x": 1.335265303982566,
+        "y": 3.071869488934708
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.6303036164791191,
-        "y": 4.000372413556215
+        "x": 1.3265877065561964,
+        "y": 3.757399685617877
       },
       "isLocked": false,
       "linkedName": "PullBack End 26"
     },
     {
       "anchor": {
-        "x": 1.8038555650021653,
+        "x": 2.246413033751335,
         "y": 4.0
       },
       "prevControl": {
-        "x": 1.5538560002184858,
+        "x": 1.9964134689676554,
         "y": 4.000466484695157
       },
       "nextControl": {
-        "x": 2.0538551297858447,
+        "x": 2.4964125985350147,
         "y": 3.999533515304843
       },
       "isLocked": false,
@@ -32,12 +32,12 @@
     },
     {
       "anchor": {
-        "x": 4.667462715708351,
+        "x": 4.6067195337237665,
         "y": 4.0
       },
       "prevControl": {
-        "x": 3.7649925833659506,
-        "y": 3.9916948161298467
+        "x": 3.7042494013813663,
+        "y": 3.9916948161298462
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,7 +46,7 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1,
+      "waypointRelativePos": 1.020264317180616,
       "rotationDegrees": 0.0
     }
   ],
@@ -54,10 +54,10 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.2,
-    "maxAcceleration": 3.3,
-    "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 360.0,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 3.7,
+    "maxAngularVelocity": 300.0,
+    "maxAngularAcceleration": 450.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
@@ -69,7 +69,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 179.39976297020667
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }

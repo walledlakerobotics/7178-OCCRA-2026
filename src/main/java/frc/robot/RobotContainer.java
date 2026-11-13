@@ -53,8 +53,9 @@ public class RobotContainer {
     m_AutonChooser = AutoBuilder.buildAutoChooser();
 
     m_AutonChooser.setDefaultOption("None", Commands.none());
-    m_AutonChooser.addOption("RightAuto", new PathPlannerAuto("RightAuto"));
-    m_AutonChooser.addOption("LeftAuto", new PathPlannerAuto("RightAuto", true));
+    m_AutonChooser.addOption("CenterAutoRight", new PathPlannerAuto("CenterAuto Angle"));
+    m_AutonChooser.addOption("CenterAutoLeft", new PathPlannerAuto("CenterAuto Angle", true));
+    m_AutonChooser.addOption("CenterAuto", new PathPlannerAuto("CenterAuto"));
 
     m_AutonTab.add(m_AutonChooser);
     m_IntakeSubsystem.oneLeftBall().whileTrue(m_LedSubsystem.oneLeft());
@@ -99,6 +100,15 @@ public class RobotContainer {
 
     m_MecanumSubsystem.setDefaultCommand(
         m_MecanumSubsystem.driveJoysticks(
+            m_driverController::getLeftY, 
+            m_driverController::getLeftX, 
+            m_driverController::getRightX,
+            m_driverController.leftBumper()
+        )
+    );
+
+    m_driverController.rightTrigger().whileTrue(
+      m_MecanumSubsystem.driveJoysticksSlow(
             m_driverController::getLeftY, 
             m_driverController::getLeftX, 
             m_driverController::getRightX,

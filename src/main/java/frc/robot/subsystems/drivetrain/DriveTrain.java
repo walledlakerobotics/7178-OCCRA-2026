@@ -252,33 +252,34 @@ public class DriveTrain extends SubsystemBase {
         });
     }
 
-    public Command resetLateralAlignSetpoint() {
-        return runOnce(() -> m_lateralAlignSetpoint = m_odometry.getPoseMeters().getY());
-    }
-
-    public Command driveJoysticksGoalAlign(DoubleSupplier xSpeedSupplier, BooleanSupplier b) {
+    public Command driveJoysticksSlow(DoubleSupplier xSpeedSupplier, DoubleSupplier ySpeedSupplier,
+            DoubleSupplier zRotationSupplier, BooleanSupplier b) {
         return run(() -> {
-            double xSpeed = -xSpeedSupplier.getAsDouble();
-            double ySpeed = m_lateralAlignController.calculate(m_odometry.getPoseMeters().getY(), m_lateralAlignSetpoint);
-            double zRotation = m_headingAlignController.calculate(m_gyro.getRotation2d().getDegrees(), 180);
+            double xSpeed = -xSpeedSupplier.getAsDouble() * 0.55;
+            double ySpeed = -ySpeedSupplier.getAsDouble() * 0.55;
+            double zRotation = -zRotationSupplier.getAsDouble() * 0.70;
 
             xSpeed = MathUtil.applyDeadband(xSpeed, MecanumDriveConstants.kDeadband);
-            // zRotation = zRotation * ySpeed * MecanumDriveConstants.kSRCF;
-            // zRotation = zRotation * ySpeed * m_SRCF;
+            ySpeed = MathUtil.applyDeadband(ySpeed, MecanumDriveConstants.kDeadband);
+            zRotation = MathUtil.applyDeadband(zRotation, MecanumDriveConstants.kDeadband);
 
             drive(xSpeed, ySpeed, zRotation, b.getAsBoolean());
         });
     }
 
+    public Command resetLateralAlignSetpoint() {
+        return runOnce(() -> m_lateralAlignSetpoint = m_odometry.getPoseMeters().getY());
+    }
+
      public Command driveJoysticksGoalAlignHdgOnly(DoubleSupplier xSpeedSupplier, DoubleSupplier ySpeedSupplier, BooleanSupplier b) {
         return run(() -> {
-            double SRCF = SmartDashboard.getNumber("SCRF", 0.0);
+
             double xSpeed = -xSpeedSupplier.getAsDouble();
             double ySpeed = -ySpeedSupplier.getAsDouble();
             double zRotation = m_headingAlignController.calculate(m_gyro.getRotation2d().getDegrees(), 180);
 
             xSpeed = MathUtil.applyDeadband(xSpeed, MecanumDriveConstants.kDeadband);
-            zRotation = zRotation + ySpeed * SRCF;
+            zRotation = zRotation + ySpeed * 0.02;
 
             drive(xSpeed, ySpeed, zRotation, b.getAsBoolean());
         });

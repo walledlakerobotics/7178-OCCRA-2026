@@ -24,6 +24,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
@@ -65,17 +66,18 @@ public class DriveTrain extends SubsystemBase {
         MecanumDriveConstants.kHAPIDp, 
         MecanumDriveConstants.kHAPIDi, 
         MecanumDriveConstants.kHAPIDd);
-
-    // TEMPORARY
-    private double m_SRCF = 0.0;
-
     //Lateral Alignment PID Controller
     private final PIDController m_lateralAlignController = new PIDController(
         MecanumDriveConstants.kLAPIDp, 
         MecanumDriveConstants.kLAPIDi, 
         MecanumDriveConstants.kLAPIDd);
 
-        Double m_lateralAlignSetpoint = 2.0;
+    // Ball Aquisition Target
+    private Translation2d m_ballAquisitionTarget = new Translation2d(0.0, 0.0);
+    // Vision VisionSubsystem = new Vision();
+
+    // TEMPORARY
+    private double m_SRCF = 0.0;
 
     // gyro
     private final Pigeon2 m_gyro = new Pigeon2(MecanumDriveConstants.kGyroCanID);
@@ -267,21 +269,16 @@ public class DriveTrain extends SubsystemBase {
         });
     }
 
-    public Command resetLateralAlignSetpoint() {
-        return runOnce(() -> m_lateralAlignSetpoint = m_odometry.getPoseMeters().getY());
-    }
-
-     public Command driveJoysticksGoalAlignHdgOnly(DoubleSupplier xSpeedSupplier, DoubleSupplier ySpeedSupplier, BooleanSupplier b) {
+     public Command driveJoysticksAutoAquire() {
         return run(() -> {
 
-            double xSpeed = -xSpeedSupplier.getAsDouble();
-            double ySpeed = -ySpeedSupplier.getAsDouble();
+            double xSpeed = 0.1;
+            double ySpeed = m_lateralAlignController.calculate(0.0,0.0);
             double zRotation = m_headingAlignController.calculate(m_gyro.getRotation2d().getDegrees(), 180);
 
-            xSpeed = MathUtil.applyDeadband(xSpeed, MecanumDriveConstants.kDeadband);
             zRotation = zRotation + ySpeed * 0.02;
 
-            drive(xSpeed, ySpeed, zRotation, b.getAsBoolean());
+            drive(xSpeed, ySpeed, zRotation, true);
         });
     }
 

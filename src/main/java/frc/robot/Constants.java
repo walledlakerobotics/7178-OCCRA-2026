@@ -156,10 +156,10 @@ public final class Constants {
   }
 
   public static final class LEDConstants {
-    public static final LEDPattern kNoBallz = LEDPattern.solid(Color.kRed);
-    public static final LEDPattern kOneRightBall = LEDPattern.solid(Color.kBlue);
+    public static final LEDPattern kRed = LEDPattern.solid(Color.kRed);
+    public static final LEDPattern kBlue = LEDPattern.solid(Color.kBlue);
     public static final LEDPattern kOneLeftBall = LEDPattern.solid(Color.kBlue);
-    public static final LEDPattern kTwoBallz = LEDPattern.solid(Color.kGreen);
+    public static final LEDPattern kGreen = LEDPattern.solid(Color.kGreen);
   }
 
   public static final class PinpointConstants {

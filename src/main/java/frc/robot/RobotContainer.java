@@ -58,8 +58,13 @@ public class RobotContainer {
     m_AutonChooser.addOption("CenterAuto", new PathPlannerAuto("CenterAuto"));
 
     m_AutonTab.add(m_AutonChooser);
+
+    m_LedSubsystem.setDefaultCommand(m_LedSubsystem.none());
+
     m_IntakeSubsystem.oneLeftBall().whileTrue(m_LedSubsystem.oneLeft());
+
     m_IntakeSubsystem.oneRightBall().whileTrue(m_LedSubsystem.oneRight());
+
     m_IntakeSubsystem.twoBalls().whileTrue(m_LedSubsystem.two());
   }
 

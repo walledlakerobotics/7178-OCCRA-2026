@@ -17,6 +17,9 @@ public class LedSubsystem extends SubsystemBase {
     AddressableLEDBuffer m_ledBuffer;
     AddressableLEDBufferView m_leftLED;
     AddressableLEDBufferView m_rightLED;
+    AddressableLEDBufferView m_leftRightLED;
+    AddressableLEDBufferView m_signLED;
+
 
 
 
@@ -30,8 +33,10 @@ public class LedSubsystem extends SubsystemBase {
       // Default to a length of 73, start empty output
       // Length is expensive to set, so only set it once, then just update data
       m_ledBuffer = new AddressableLEDBuffer(135); //83 without LED Sign
+      m_leftRightLED = m_ledBuffer.createView(0, 82);
       m_leftLED = m_ledBuffer.createView(0, 41);
-      m_rightLED = m_ledBuffer.createView(42, 134);
+      m_rightLED = m_ledBuffer.createView(42, 82);
+      m_signLED = m_ledBuffer.createView(83, 134);
       m_led.setLength(m_ledBuffer.getLength());
 
       // Write the data to the LED strip
@@ -59,19 +64,21 @@ public class LedSubsystem extends SubsystemBase {
     }
 
     public Command none() {
-      return pattern(LEDConstants.kNoBallz, m_ledBuffer);
+      return pattern(LEDConstants.kRed, m_leftRightLED);
     }
 
     public Command oneLeft() {
-      return pattern(LEDConstants.kOneLeftBall, m_leftLED);
+      return pattern(LEDConstants.kGreen, m_leftLED);
+      //.andThpattern(LEDConstants.kBlue, m_signLED));
     }
 
      public Command oneRight() {
-      return pattern(LEDConstants.kOneRightBall, m_rightLED);
+      return pattern(LEDConstants.kGreen, m_rightLED);
+      //.andThen(pattern(LEDConstants.kBlue, m_signLED));
     }
 
     public Command two() {
-       return pattern(LEDConstants.kTwoBallz, m_ledBuffer);
+       return pattern(LEDConstants.kBlue, m_ledBuffer);
      
     }
 }

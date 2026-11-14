@@ -18,6 +18,8 @@ public class LedSubsystem extends SubsystemBase {
     AddressableLEDBufferView m_leftLED;
     AddressableLEDBufferView m_rightLED;
 
+
+
     public LedSubsystem() {
         // PWM port 9
       // Must be a PWM header, not MXP or DIO
@@ -27,9 +29,9 @@ public class LedSubsystem extends SubsystemBase {
       // Reuse buffer
       // Default to a length of 73, start empty output
       // Length is expensive to set, so only set it once, then just update data
-      m_ledBuffer = new AddressableLEDBuffer(83);
+      m_ledBuffer = new AddressableLEDBuffer(135); //83 without LED Sign
       m_leftLED = m_ledBuffer.createView(0, 41);
-      m_rightLED = m_ledBuffer.createView(42, 82);
+      m_rightLED = m_ledBuffer.createView(42, 134);
       m_led.setLength(m_ledBuffer.getLength());
 
       // Write the data to the LED strip
@@ -41,6 +43,7 @@ public class LedSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
      m_led.setData(m_ledBuffer);
+     
     }
 
     public Command pattern(LEDPattern pattern, AddressableLEDBufferView buffer) {
@@ -69,6 +72,7 @@ public class LedSubsystem extends SubsystemBase {
 
     public Command two() {
        return pattern(LEDConstants.kTwoBallz, m_ledBuffer);
+     
     }
 }
 

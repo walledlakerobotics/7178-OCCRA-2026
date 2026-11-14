@@ -73,7 +73,7 @@ public class DriveTrain extends SubsystemBase {
         MecanumDriveConstants.kLAPIDd);
 
     // Ball Aquisition Target
-    private Translation2d m_ballAquisitionTarget = new Translation2d(0.0, 0.0);
+    private double m_ballAquisitionTarget = 0.0;
     // Vision VisionSubsystem = new Vision();
 
     // TEMPORARY
